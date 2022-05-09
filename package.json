@@ -1,0 +1,28 @@
+{
+  "name": "gamebot",
+  "version": "1.0.0",
+  "description": "A discord bot for the games",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sadashii/GameBot.git"
+  },
+  "author": "Sadashii",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sadashii/GameBot/issues"
+  },
+  "homepage": "https://github.com/Sadashii/GameBot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.13.0",
+    "@discordjs/rest": "^0.4.1",
+    "discord-api-types": "^0.32.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.3.2",
+    "winston": "^3.7.2"
+  }
+}
