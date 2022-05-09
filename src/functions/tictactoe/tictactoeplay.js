@@ -79,7 +79,7 @@ module.exports = {
       if (win) {
         win.tictactoe.wins += 1;
         win.tictactoe.games += 1;
-        win.tictactoe.winstreak += 1  ;
+        win.tictactoe.winstreak += 1;
         if (win.tictactoe.against[lid]) {
           win.tictactoe.against[lid].wins += 1;
           win.tictactoe.against[lid].games += 1;
@@ -162,7 +162,7 @@ module.exports = {
     
     if (turnsDone === 9) {
       embed.description = `It's a draw!`;
-  
+      
       let wid = currentmove.slice(2, -1);
       let lid = players[0] === currentmove ? players[1].slice(2, -1) : players[0].slice(2, -1);
       

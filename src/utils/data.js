@@ -6,4 +6,4 @@ const COLORS = {
 };
 
 
-module.exports = {COLORS}
+module.exports = {COLORS};

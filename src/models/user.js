@@ -1,7 +1,7 @@
 /*
     Module Dependencies
 */
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
@@ -14,6 +14,6 @@ const Schema = mongoose.Schema;
 const User = new Schema({
   _id: String,
   tictactoe: Object,
-})
+});
 
-mongoose.model('User', User, 'users');
+mongoose.model("User", User, "users");

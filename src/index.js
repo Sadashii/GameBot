@@ -45,7 +45,7 @@ client.once("ready", async () => {
   client.user.setActivity({
     name: "Brainfuck",
     type: "WATCHING",
-  })
+  });
   
   logger.info("Cooked!");
 });
@@ -71,7 +71,7 @@ client.on("interactionCreate", async interaction => {
     }
   }
   
-
+  
 });
 
 new Promise((resolve, reject) => {
@@ -95,4 +95,4 @@ new Promise((resolve, reject) => {
       reject(err);
     }
   });
-})
+});

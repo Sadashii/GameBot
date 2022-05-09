@@ -14,8 +14,8 @@ const command = new SlashCommandBuilder()
     .setDescription("View a user's TicTacToe profile.")
     .addUserOption(user => user
       .setName("user")
-      .setDescription("The user to view the profile of. Choose none to view your own profile."))
-  )
+      .setDescription("The user to view the profile of. Choose none to view your own profile.")),
+  );
 
 
 module.exports = {
@@ -31,36 +31,36 @@ module.exports = {
         if (!userStats) {
           return await interaction.reply({
             content: `${user.username} has not played TicTacToe yet.`,
-            ephemeral: true
+            ephemeral: true,
           });
         }
-  
+        
         let most_played_against = Object.entries(userStats.against).sort((a, b) => b[1].games - a[1].games).slice(0, 3);
-        let most_played = []
+        let most_played = [];
         for (let [id, stats] of most_played_against) {
-          stats.user = (await interaction.guild.members.fetch(id)).toString() || id
-          stats.games !== 0 && most_played.push(`${stats.user} (${stats.games} games)`)
+          stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+          stats.games !== 0 && most_played.push(`${stats.user} (${stats.games} games)`);
         }
         
         let most_won_against = Object.entries(userStats.against).sort((a, b) => b[1].wins - a[1].wins).slice(0, 3);
-        let most_won = []
+        let most_won = [];
         for (let [id, stats] of most_won_against) {
-          stats.user = (await interaction.guild.members.fetch(id)).toString() || id
-          stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins} wins)`)
+          stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+          stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins} wins)`);
         }
         
         let most_lost_against = Object.entries(userStats.against).sort((a, b) => a[1].losses - b[1].losses).slice(0, 3);
-        let most_lost = []
+        let most_lost = [];
         for (let [id, stats] of most_lost_against) {
-          stats.user = (await interaction.guild.members.fetch(id)).toString() || id
-          stats.losses !== 0 && most_lost.push(`${stats.user} (${stats.losses} losses)`)
+          stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+          stats.losses !== 0 && most_lost.push(`${stats.user} (${stats.losses} losses)`);
         }
         
         let highest_winstreak_against = Object.entries(userStats.against).sort((a, b) => b[1].winstreak - a[1].winstreak).slice(0, 3);
-        let highest_winstreak = []
+        let highest_winstreak = [];
         for (let [id, stats] of highest_winstreak_against) {
-          stats.user = (await interaction.guild.members.fetch(id)).toString() || id
-          stats.winstreak !== 0 && highest_winstreak.push(`${stats.user} (${stats.winstreak} winstreak)`)
+          stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+          stats.winstreak !== 0 && highest_winstreak.push(`${stats.user} (${stats.winstreak} winstreak)`);
         }
         
         
@@ -78,10 +78,10 @@ module.exports = {
           .addField("Most won against", most_won.join("\n") || "-", true)
           .addField("Most lost against", most_lost.join("\n") || "-", true)
           .addField("Highest win streak against (currently)", highest_winstreak.join("\n") || "-", true)
-          .setColor(COLORS.SUCCESS)
+          .setColor(COLORS.SUCCESS);
         
         await interaction.reply({
-          embeds: [embed]
+          embeds: [embed],
         });
     }
   },
