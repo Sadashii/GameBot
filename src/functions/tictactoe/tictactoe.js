@@ -1,6 +1,6 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
-const {ICONS} = require("./data");
+const {COLORS} = require("../../utils/data");
 
 const command = new SlashCommandBuilder()
   .setName("tictactoe")
@@ -37,7 +37,7 @@ module.exports = {
     const embed = new MessageEmbed()
       .setTitle("TicTacToe")
       .setDescription(`${interaction.user.toString()} vs ${opponent.toString()}\n\nMove: ${interaction.user.toString()}\nTurns: 0`)
-      .setColor("#0099ff");
+      .setColor(COLORS.INFO);
     
     const components = [];
     for (let rowCount = 0; rowCount < 3; rowCount++) {
@@ -55,6 +55,7 @@ module.exports = {
     
     
     await interaction.editReply({
+      content: `${interaction.user.toString()} vs ${opponent.toString()}`,
       embeds: [embed],
       components,
     });

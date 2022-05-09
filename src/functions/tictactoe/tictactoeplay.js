@@ -71,167 +71,188 @@ module.exports = {
         return row;
       });
       
-      let p1id = players[0].slice(2, -1);
-      let p2id = players[1].slice(2, -1);
+      let wid = currentmove.slice(2, -1);
+      let lid = players[0] === currentmove ? players[1].slice(2, -1) : players[0].slice(2, -1);
       
-      let p1 = await User.findById(p1id);
-      if (p1) {
-        p1.tictactoe.wins += 1;
-        p1.tictactoe.games += 1;
-        if (!p1.tictactoe.against[p2id]) {
-          p1.tictactoe.against[p2id] = {
+      
+      let win = await User.findById(wid);
+      if (win) {
+        win.tictactoe.wins += 1;
+        win.tictactoe.games += 1;
+        win.tictactoe.winstreak += 1  ;
+        if (win.tictactoe.against[lid]) {
+          win.tictactoe.against[lid].wins += 1;
+          win.tictactoe.against[lid].games += 1;
+          win.tictactoe.against[lid].winstreak += 1;
+        } else {
+          win.tictactoe.against[lid] = {
             wins: 1,
             losses: 0,
             ties: 0,
             games: 1,
+            winstreak: 1,
           };
-        } else {
-          p1.tictactoe.against[p2id].wins += 1;
-          p1.tictactoe.against[p2id].games += 1;
         }
-        
-        p1.markModified("tictactoe");
+        win.markModified("tictactoe");
       } else {
-        p1 = new User({
-          _id: p1id,
+        win = new User({
+          _id: wid,
           tictactoe: {
             wins: 1,
             losses: 0,
             ties: 0,
             games: 1,
+            winstreak: 1,
             against: {
-              [p2id]: {
+              [lid]: {
                 wins: 1,
                 losses: 0,
                 ties: 0,
                 games: 1,
+                winstreak: 1,
               },
             },
           },
         });
       }
-      await p1.save();
+      await win.save();
       
-      let p2 = await User.findById(p2id);
-      if (p2) {
-        p2.tictactoe.losses += 1;
-        p2.tictactoe.games += 1;
-        if (!p2.tictactoe.against[p1id]) {
-          p2.tictactoe.against[p1id] = {
+      
+      let los = await User.findById(lid);
+      if (los) {
+        los.tictactoe.losses += 1;
+        los.tictactoe.games += 1;
+        los.tictactoe.winstreak = 0;
+        if (los.tictactoe.against[wid]) {
+          los.tictactoe.against[wid].losses += 1;
+          los.tictactoe.against[wid].games += 1;
+          los.tictactoe.against[wid].winstreak = 0;
+        } else {
+          los.tictactoe.against[wid] = {
             wins: 0,
             losses: 1,
             ties: 0,
             games: 1,
           };
-        } else {
-          p2.tictactoe.against[p1id].losses += 1;
-          p2.tictactoe.against[p1id].games += 1;
         }
-        p2.markModified("tictactoe");
+        los.markModified("tictactoe");
       } else {
-        p2 = new User({
-          _id: p2id,
+        los = new User({
+          _id: lid,
           tictactoe: {
             wins: 0,
             losses: 1,
             ties: 0,
             games: 1,
+            winstreak: 0,
             against: {
-              [p1id]: {
+              [wid]: {
                 wins: 0,
                 losses: 1,
                 ties: 0,
                 games: 1,
+                winstreak: 0,
               },
             },
           },
         });
       }
-      await p2.save();
-    } else if (turnsDone === 9) {
+      await los.save();
+    }
+    
+    if (turnsDone === 9) {
       embed.description = `It's a draw!`;
+  
+      let wid = currentmove.slice(2, -1);
+      let lid = players[0] === currentmove ? players[1].slice(2, -1) : players[0].slice(2, -1);
       
-      let p1id = players[0].slice(2, -1);
-      let p2id = players[1].slice(2, -1);
-      
-      let p1 = await User.findById(p1id);
-      if (p1) {
-        p1.tictactoe.ties += 1;
-        p1.tictactoe.games += 1;
-        if (!p1.tictactoe.against[p2id]) {
-          p1.tictactoe.against[p2id] = {
+      let win = await User.findById(wid);
+      if (win) {
+        win.tictactoe.ties += 1;
+        win.tictactoe.games += 1;
+        win.tictactoe.winstreak = 0;
+        if (win.tictactoe.against[lid]) {
+          win.tictactoe.against[lid].ties += 1;
+          win.tictactoe.against[lid].games += 1;
+          win.tictactoe.against[lid].winstreak = 0;
+        } else {
+          win.tictactoe.against[lid] = {
             wins: 0,
             losses: 0,
             ties: 1,
             games: 1,
+            winstreak: 0,
           };
-        } else {
-          p1.tictactoe.against[p2id].ties += 1;
-          p1.tictactoe.against[p2id].games += 1;
         }
-        p1.markModified("tictactoe");
+        win.markModified("tictactoe");
       } else {
-        p1 = new User({
-          _id: p1id,
+        win = new User({
+          _id: wid,
           tictactoe: {
             wins: 0,
             losses: 0,
             ties: 1,
             games: 1,
+            winstreak: 0,
             against: {
-              [p2id]: {
+              [lid]: {
                 wins: 0,
                 losses: 0,
                 ties: 1,
                 games: 1,
+                winstreak: 0,
+              },
+            },
+          },
+        });
+      }
+      await win.save();
+      
+      let los = await User.findById(lid);
+      if (los) {
+        los.tictactoe.ties += 1;
+        los.tictactoe.games += 1;
+        los.tictactoe.winstreak = 0;
+        if (los.tictactoe.against[wid]) {
+          los.tictactoe.against[wid].ties += 1;
+          los.tictactoe.against[wid].games += 1;
+          los.tictactoe.against[wid].winstreak = 0;
+        } else {
+          los.tictactoe.against[wid] = {
+            wins: 0,
+            losses: 0,
+            ties: 1,
+            games: 1,
+            winstreak: 0,
+          };
+        }
+        los.markModified("tictactoe");
+      } else {
+        los = new User({
+          _id: lid,
+          tictactoe: {
+            wins: 0,
+            losses: 0,
+            ties: 1,
+            games: 1,
+            winstreak: 0,
+            against: {
+              [wid]: {
+                wins: 0,
+                losses: 0,
+                ties: 1,
+                games: 1,
+                winstreak: 0,
               },
             },
           },
         });
       }
       
-      await p1.save();
-      
-      let p2 = await User.findById(p2id);
-      if (p2) {
-        p2.tictactoe.ties += 1;
-        p2.tictactoe.games += 1;
-        if (!p2.tictactoe.against[p1id]) {
-          p2.tictactoe.against[p1id] = {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-          };
-        } else {
-          p2.tictactoe.against[p1id].ties += 1;
-          p2.tictactoe.against[p1id].games += 1;
-        }
-        p2.markModified("tictactoe");
-      } else {
-        p2 = new User({
-          _id: p2id,
-          tictactoe: {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-            against: {
-              [p1id]: {
-                wins: 0,
-                losses: 0,
-                ties: 1,
-                games: 1,
-              },
-            },
-          },
-        });
-      }
-      
-      await p2.save();
-      
-      
-    } else {
+      await los.save();
+    }
+    
+    if (!gameOver && turnsDone !== 9) {
       let nextMove = turnsDone % 2 === 0 ? players[0] : players[1];
       embed.description = `${players[0]} vs ${players[1]}\n\nMove: ${nextMove}\nTurns: ${turnsDone}`;
     }
