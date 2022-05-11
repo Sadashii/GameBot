@@ -43,7 +43,7 @@ require("./slash");
 
 client.once("ready", async () => {
   client.user.setActivity({
-    name: "Brainfuck",
+    name: "Kasparov vs. Topalov 1999",
     type: "WATCHING",
   });
   
