@@ -25,21 +25,13 @@ for (const group of commandGroups) {
 const rest = new REST({version: "10"}).setToken(process.env.DISCORD_BOT_TOKEN);
 
 if (process.env.NODE_ENV === "DEVELOPMENT") {
-  rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_ID, process.env.DEVELOPMENT_SERVER_ID), {body: commands})
-    .then((res) => {
-      logger.info("Registered commands!");
-    })
-    .catch(err => {
-      logger.error(err);
-    });
+  rest
+    .put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_ID, process.env.DEVELOPMENT_SERVER_ID), {body: commands})
+    .then(res => logger.info(`Updated commands for ${process.env.DEVELOPMENT_SERVER_ID}`))
+    .catch(err => logger.error(err));
 } else {
-  for (const guildID of []) {
-    rest.put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_ID, guildID), {body: commands})
-      .then(() => {
-        logger.info(`Registered commands in ${guildID}!`);
-      })
-      .catch(err => {
-        logger.error(err);
-      });
-  }
+  rest
+    .put(Routes.applicationCommands(process.env.DISCORD_APPLICATION_ID), {body: commands})
+    .then(res => logger.info(`Registered ${res.body.length} global commands`))
+    .catch(err => logger.error(err));
 }
