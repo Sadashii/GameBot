@@ -36,7 +36,7 @@ module.exports = {
     
     let gameOver = false;
     let grid = components.map(row => {
-      return row.components.map(component => component.emoji?.name);
+      return row.components.map(component => component.emoji?.name == "none" ? undefined : component.emoji.name);
     });
     for (const row of grid) {
       if (row[0] === row[1] && row[1] === row[2] && row[0] !== undefined) {

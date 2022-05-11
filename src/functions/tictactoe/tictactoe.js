@@ -1,6 +1,7 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
 const {COLORS} = require("../../utils/data");
+const {ICONS} = require("./data");
 
 const command = new SlashCommandBuilder()
   .setName("tictactoe")
@@ -46,7 +47,7 @@ module.exports = {
         row.addComponents(
           new MessageButton()
             .setCustomId(`tictactoe-${rowCount}-${colCount}`)
-            .setLabel(" ")
+            .setEmoji(ICONS.NONE)
             .setStyle("SECONDARY"),
         );
       }

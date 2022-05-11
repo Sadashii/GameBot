@@ -13,7 +13,14 @@ const Schema = mongoose.Schema;
 
 const User = new Schema({
   _id: String,
-  tictactoe: Object,
+  tictactoe: {
+    wins: Number,
+    losses: Number,
+    ties: Number,
+    games: Number,
+    winstreak: Number,
+    against: [Object],
+  },
 });
 
 mongoose.model("User", User, "users");
