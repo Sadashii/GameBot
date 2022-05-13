@@ -36,7 +36,7 @@ module.exports = {
     
     let gameOver = false;
     let grid = components.map(row => {
-      return row.components.map(component => component.emoji?.name == "none" ? undefined : component.emoji.name);
+      return row.components.map(component => component.emoji?.name === "none" ? undefined : component.emoji.name);
     });
     for (const row of grid) {
       if (row[0] === row[1] && row[1] === row[2] && row[0] !== undefined) {
@@ -74,89 +74,89 @@ module.exports = {
       let wid = currentmove.slice(2, -1);
       let lid = players[0] === currentmove ? players[1].slice(2, -1) : players[0].slice(2, -1);
       
-      
       let win = await User.findById(wid);
-      if (win) {
-        win.tictactoe.wins += 1;
-        win.tictactoe.games += 1;
-        win.tictactoe.winstreak += 1;
-        if (win.tictactoe.against[lid]) {
-          win.tictactoe.against[lid].wins += 1;
-          win.tictactoe.against[lid].games += 1;
-          win.tictactoe.against[lid].winstreak += 1;
-        } else {
-          win.tictactoe.against[lid] = {
-            wins: 1,
-            losses: 0,
-            ties: 0,
-            games: 1,
-            winstreak: 1,
-          };
-        }
-        win.markModified("tictactoe");
-      } else {
-        win = new User({
-          _id: wid,
-          tictactoe: {
-            wins: 1,
-            losses: 0,
-            ties: 0,
-            games: 1,
-            winstreak: 1,
-            against: {
-              [lid]: {
-                wins: 1,
-                losses: 0,
-                ties: 0,
-                games: 1,
-                winstreak: 1,
-              },
+      if (!win) {
+        win = win = new User({_id: wid});
+      }
+      if (!win.tictactoe) {
+        win.tictactoe = {
+          wins: 1,
+          losses: 0,
+          ties: 0,
+          games: 1,
+          winstreak: 1,
+          against: {
+            [lid]: {
+              wins: 1,
+              losses: 0,
+              ties: 0,
+              games: 1,
+              winstreak: 1,
             },
           },
-        });
+        };
       }
+      
+      win.tictactoe.wins += 1;
+      win.tictactoe.games += 1;
+      win.tictactoe.winstreak += 1;
+      if (win.tictactoe.against[lid]) {
+        win.tictactoe.against[lid].wins += 1;
+        win.tictactoe.against[lid].games += 1;
+        win.tictactoe.against[lid].winstreak += 1;
+      } else {
+        win.tictactoe.against[lid] = {
+          wins: 1,
+          losses: 0,
+          ties: 0,
+          games: 1,
+          winstreak: 1,
+        };
+      }
+      win.markModified("tictactoe");
       await win.save();
       
       
       let los = await User.findById(lid);
-      if (los) {
-        los.tictactoe.losses += 1;
-        los.tictactoe.games += 1;
-        los.tictactoe.winstreak = 0;
-        if (los.tictactoe.against[wid]) {
-          los.tictactoe.against[wid].losses += 1;
-          los.tictactoe.against[wid].games += 1;
-          los.tictactoe.against[wid].winstreak = 0;
-        } else {
-          los.tictactoe.against[wid] = {
-            wins: 0,
-            losses: 1,
-            ties: 0,
-            games: 1,
-          };
-        }
-        los.markModified("tictactoe");
-      } else {
-        los = new User({
-          _id: lid,
-          tictactoe: {
-            wins: 0,
-            losses: 1,
-            ties: 0,
-            games: 1,
-            winstreak: 0,
-            against: {
-              [wid]: {
-                wins: 0,
-                losses: 1,
-                ties: 0,
-                games: 1,
-                winstreak: 0,
-              },
+      if (!los) {
+        los = new User({_id: lid});
+      }
+      if (!los.tictactoe) {
+        los.tictactoe = {
+          wins: 0,
+          losses: 1,
+          ties: 0,
+          games: 1,
+          winstreak: 0,
+          against: {
+            [wid]: {
+              wins: 0,
+              losses: 1,
+              ties: 0,
+              games: 1,
+              winstreak: 0,
             },
           },
-        });
+        };
       }
+      
+      los.tictactoe.losses += 1;
+      los.tictactoe.games += 1;
+      los.tictactoe.winstreak = 0;
+      if (los.tictactoe.against[wid]) {
+        los.tictactoe.against[wid].losses += 1;
+        los.tictactoe.against[wid].games += 1;
+        los.tictactoe.against[wid].winstreak = 0;
+      } else {
+        los.tictactoe.against[wid] = {
+          wins: 0,
+          losses: 1,
+          ties: 0,
+          games: 1,
+          winstreak: 0,
+        };
+      }
+      los.markModified("tictactoe");
       await los.save();
     }
     
@@ -167,88 +167,88 @@ module.exports = {
       let lid = players[0] === currentmove ? players[1].slice(2, -1) : players[0].slice(2, -1);
       
       let win = await User.findById(wid);
-      if (win) {
-        win.tictactoe.ties += 1;
-        win.tictactoe.games += 1;
-        win.tictactoe.winstreak = 0;
-        if (win.tictactoe.against[lid]) {
-          win.tictactoe.against[lid].ties += 1;
-          win.tictactoe.against[lid].games += 1;
-          win.tictactoe.against[lid].winstreak = 0;
-        } else {
-          win.tictactoe.against[lid] = {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-            winstreak: 0,
-          };
-        }
-        win.markModified("tictactoe");
-      } else {
-        win = new User({
-          _id: wid,
-          tictactoe: {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-            winstreak: 0,
-            against: {
-              [lid]: {
-                wins: 0,
-                losses: 0,
-                ties: 1,
-                games: 1,
-                winstreak: 0,
-              },
+      if (!win) {
+        win = win = new User({_id: wid});
+      }
+      if (!win.tictactoe) {
+        win.tictactoe = {
+          wins: 0,
+          losses: 0,
+          ties: 1,
+          games: 1,
+          winstreak: 0,
+          against: {
+            [lid]: {
+              wins: 0,
+              losses: 0,
+              ties: 1,
+              games: 1,
+              winstreak: 0,
             },
           },
-        });
+        };
       }
+      
+      win.tictactoe.ties += 1;
+      win.tictactoe.games += 1;
+      win.tictactoe.winstreak = 0;
+      if (win.tictactoe.against[lid]) {
+        win.tictactoe.against[lid].ties += 1;
+        win.tictactoe.against[lid].games += 1;
+        win.tictactoe.against[lid].winstreak = 0;
+      } else {
+        win.tictactoe.against[lid] = {
+          wins: 0,
+          losses: 0,
+          ties: 1,
+          games: 1,
+          winstreak: 0,
+        };
+      }
+      win.markModified("tictactoe");
       await win.save();
       
+      
       let los = await User.findById(lid);
-      if (los) {
-        los.tictactoe.ties += 1;
-        los.tictactoe.games += 1;
-        los.tictactoe.winstreak = 0;
-        if (los.tictactoe.against[wid]) {
-          los.tictactoe.against[wid].ties += 1;
-          los.tictactoe.against[wid].games += 1;
-          los.tictactoe.against[wid].winstreak = 0;
-        } else {
-          los.tictactoe.against[wid] = {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-            winstreak: 0,
-          };
-        }
-        los.markModified("tictactoe");
-      } else {
-        los = new User({
-          _id: lid,
-          tictactoe: {
-            wins: 0,
-            losses: 0,
-            ties: 1,
-            games: 1,
-            winstreak: 0,
-            against: {
-              [wid]: {
-                wins: 0,
-                losses: 0,
-                ties: 1,
-                games: 1,
-                winstreak: 0,
-              },
+      if (!los) {
+        los = new User({_id: lid});
+      }
+      if (!los.tictactoe) {
+        los.tictactoe = {
+          wins: 0,
+          losses: 0,
+          ties: 1,
+          games: 1,
+          winstreak: 0,
+          against: {
+            [wid]: {
+              wins: 0,
+              losses: 0,
+              ties: 1,
+              games: 1,
+              winstreak: 0,
             },
           },
-        });
+        };
       }
       
+      los.tictactoe.ties += 1;
+      los.tictactoe.games += 1;
+      los.tictactoe.winstreak = 0;
+      if (los.tictactoe.against[wid]) {
+        los.tictactoe.against[wid].ties += 1;
+        los.tictactoe.against[wid].games += 1;
+        los.tictactoe.against[wid].winstreak = 0;
+      } else {
+        los.tictactoe.against[wid] = {
+          wins: 0,
+          losses: 0,
+          ties: 1,
+          games: 1,
+          winstreak: 0,
+        };
+      }
+      los.markModified("tictactoe");
       await los.save();
     }
     

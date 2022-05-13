@@ -17,7 +17,6 @@ logger.info("Successfully loaded DB models!");
 
 // Loader
 client.buttons = new Collection();
-client.permissions = new Collection();
 client.commands = new Collection();
 const categories = fs.readdirSync("./src/functions");
 for (const group of categories) {
@@ -29,7 +28,6 @@ for (const group of categories) {
     }
     switch (command.type) {
       case "COMMAND":
-        client.permissions.set(command.data.name, command.permissions);
         client.commands.set(command.data.name, command);
         break;
       case "BUTTON":
@@ -70,8 +68,6 @@ client.on("interactionCreate", async interaction => {
       }
     }
   }
-  
-  
 });
 
 new Promise((resolve, reject) => {
