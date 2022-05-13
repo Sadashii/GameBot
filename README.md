@@ -24,7 +24,7 @@ added regularly.
 ## Currently supported Games
 
 - [x] TicTacToe - 3x3 grid with advanced games statistics, streaks, versus, and more!
-- [ ] Hangman (coming being developed)
+- [x] Hangman - Guess the word!
 
 ## 💻 Local Development
 
