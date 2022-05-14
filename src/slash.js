@@ -32,6 +32,6 @@ if (process.env.NODE_ENV === "DEVELOPMENT") {
 } else {
   rest
     .put(Routes.applicationCommands(process.env.DISCORD_APPLICATION_ID), {body: commands})
-    .then(res => logger.info(`Registered ${res.body.length} global commands`))
+    .then(res => logger.info(`Registered ${commands.length} global commands`))
     .catch(err => logger.error(err));
 }
