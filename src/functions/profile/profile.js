@@ -23,7 +23,7 @@ const command = new SlashCommandBuilder()
       .setDescription("The user to view the profile of. Choose none to view your own profile.")),
   );
 
-const tictactoe = async (client, interactionm, user) => {
+const tictactoe = async (client, interaction, user) => {
   let userStats = (await User.findById(user.id))?.tictactoe;
   if (!userStats) {
     return await interaction.reply({

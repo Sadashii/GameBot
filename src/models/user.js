@@ -14,7 +14,7 @@ const Schema = mongoose.Schema;
 const User = new Schema({
   _id: String,
   tictactoe: Object,
-  hangman: Object
+  hangman: Object,
 });
 
 mongoose.model("User", User, "users");

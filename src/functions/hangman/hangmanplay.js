@@ -62,7 +62,7 @@ module.exports = {
     });
     
     
-    // Handle gameover logic
+    // Handle game over logic
     if (livesLeft === 0) {
       components = game.components.map(row => {
         row.components = row.components.map(component => {

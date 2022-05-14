@@ -80,18 +80,18 @@ module.exports = {
       }
       if (!win.tictactoe) {
         win.tictactoe = {
-          wins: 1,
+          wins: 0,
           losses: 0,
           ties: 0,
-          games: 1,
-          winstreak: 1,
+          games: 0,
+          winstreak: 0,
           against: {
             [lid]: {
-              wins: 1,
+              wins: 0,
               losses: 0,
               ties: 0,
-              games: 1,
-              winstreak: 1,
+              games: 0,
+              winstreak: 0,
             },
           },
         };
@@ -100,19 +100,21 @@ module.exports = {
       win.tictactoe.wins += 1;
       win.tictactoe.games += 1;
       win.tictactoe.winstreak += 1;
-      if (win.tictactoe.against[lid]) {
-        win.tictactoe.against[lid].wins += 1;
-        win.tictactoe.against[lid].games += 1;
-        win.tictactoe.against[lid].winstreak += 1;
-      } else {
+      
+      if (!win.tictactoe.against[lid]) {
         win.tictactoe.against[lid] = {
-          wins: 1,
+          wins: 0,
           losses: 0,
           ties: 0,
-          games: 1,
-          winstreak: 1,
+          games: 0,
+          winstreak: 0,
         };
       }
+      
+      win.tictactoe.against[lid].wins += 1;
+      win.tictactoe.against[lid].games += 1;
+      win.tictactoe.against[lid].winstreak += 1;
+      
       win.markModified("tictactoe");
       await win.save();
       
@@ -124,16 +126,16 @@ module.exports = {
       if (!los.tictactoe) {
         los.tictactoe = {
           wins: 0,
-          losses: 1,
+          losses: 0,
           ties: 0,
-          games: 1,
+          games: 0,
           winstreak: 0,
           against: {
             [wid]: {
               wins: 0,
-              losses: 1,
+              losses: 0,
               ties: 0,
-              games: 1,
+              games: 0,
               winstreak: 0,
             },
           },
@@ -143,19 +145,21 @@ module.exports = {
       los.tictactoe.losses += 1;
       los.tictactoe.games += 1;
       los.tictactoe.winstreak = 0;
-      if (los.tictactoe.against[wid]) {
-        los.tictactoe.against[wid].losses += 1;
-        los.tictactoe.against[wid].games += 1;
-        los.tictactoe.against[wid].winstreak = 0;
-      } else {
+      
+      if (!los.tictactoe.against[wid]) {
         los.tictactoe.against[wid] = {
           wins: 0,
-          losses: 1,
+          losses: 0,
           ties: 0,
-          games: 1,
+          games: 0,
           winstreak: 0,
         };
       }
+      
+      los.tictactoe.against[wid].losses += 1;
+      los.tictactoe.against[wid].games += 1;
+      los.tictactoe.against[wid].winstreak = 0;
+      
       los.markModified("tictactoe");
       await los.save();
     }
@@ -174,15 +178,15 @@ module.exports = {
         win.tictactoe = {
           wins: 0,
           losses: 0,
-          ties: 1,
-          games: 1,
+          ties: 0,
+          games: 0,
           winstreak: 0,
           against: {
             [lid]: {
               wins: 0,
               losses: 0,
-              ties: 1,
-              games: 1,
+              ties: 0,
+              games: 0,
               winstreak: 0,
             },
           },
@@ -192,19 +196,21 @@ module.exports = {
       win.tictactoe.ties += 1;
       win.tictactoe.games += 1;
       win.tictactoe.winstreak = 0;
-      if (win.tictactoe.against[lid]) {
-        win.tictactoe.against[lid].ties += 1;
-        win.tictactoe.against[lid].games += 1;
-        win.tictactoe.against[lid].winstreak = 0;
-      } else {
+      
+      if (!win.tictactoe.against[lid]) {
         win.tictactoe.against[lid] = {
           wins: 0,
           losses: 0,
-          ties: 1,
-          games: 1,
+          ties: 0,
+          games: 0,
           winstreak: 0,
         };
       }
+      
+      win.tictactoe.against[lid].ties += 1;
+      win.tictactoe.against[lid].games += 1;
+      win.tictactoe.against[lid].winstreak = 0;
+      
       win.markModified("tictactoe");
       await win.save();
       
@@ -217,15 +223,15 @@ module.exports = {
         los.tictactoe = {
           wins: 0,
           losses: 0,
-          ties: 1,
-          games: 1,
+          ties: 0,
+          games: 0,
           winstreak: 0,
           against: {
             [wid]: {
               wins: 0,
               losses: 0,
-              ties: 1,
-              games: 1,
+              ties: 0,
+              games: 0,
               winstreak: 0,
             },
           },
@@ -235,19 +241,22 @@ module.exports = {
       los.tictactoe.ties += 1;
       los.tictactoe.games += 1;
       los.tictactoe.winstreak = 0;
-      if (los.tictactoe.against[wid]) {
-        los.tictactoe.against[wid].ties += 1;
-        los.tictactoe.against[wid].games += 1;
-        los.tictactoe.against[wid].winstreak = 0;
-      } else {
+      
+      if (!los.tictactoe.against[wid]) {
         los.tictactoe.against[wid] = {
           wins: 0,
           losses: 0,
-          ties: 1,
-          games: 1,
+          ties: 0,
+          games: 0,
           winstreak: 0,
         };
       }
+      
+      los.tictactoe.against[wid].ties += 1;
+      los.tictactoe.against[wid].games += 1;
+      los.tictactoe.against[wid].winstreak = 0;
+      
+      
       los.markModified("tictactoe");
       await los.save();
     }
