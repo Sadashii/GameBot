@@ -11,8 +11,8 @@ module.exports = {
     const game = interaction.message;
     
     if (interaction.user.id !== game.interaction.user.id) {
-      return interaction.message.channel.send({
-        content: "You can't play hangman with someone else!",
+      return interaction.reply({
+        content: "You can't play someone else's hangman!",
         ephemeral: true,
       });
     }
