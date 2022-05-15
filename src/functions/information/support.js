@@ -22,6 +22,12 @@ module.exports = {
     const component = new MessageActionRow()
       .addComponents(
         new MessageButton()
+          .setURL(config.INVITE_URL)
+          .setLabel("Invite me to your server")
+          .setStyle("LINK")
+      )
+      .addComponents(
+        new MessageButton()
           .setURL("https://buymeacoffee.com/Sadashii")
           .setLabel("Buy me a coffee!")
           .setStyle("LINK")
