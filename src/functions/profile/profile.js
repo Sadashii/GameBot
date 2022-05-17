@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 
 const mongoose = require("mongoose");
 const {COLORS} = require("../../utils/data");
@@ -32,31 +32,48 @@ const tictactoe = async (client, interaction, user) => {
     });
   }
   
+  
   let most_played_against = Object.entries(userStats.against).sort((a, b) => b[1].games - a[1].games).slice(0, 3);
   let most_played = [];
   for (let [id, stats] of most_played_against) {
-    stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+    try {
+      stats.user = (await client.users.fetch(id)).toString()
+    } catch (e) {
+      stats.user = id;
+    }
     stats.games !== 0 && most_played.push(`${stats.user} (${stats.games} games)`);
   }
   
   let most_won_against = Object.entries(userStats.against).sort((a, b) => b[1].wins - a[1].wins).slice(0, 3);
   let most_won = [];
   for (let [id, stats] of most_won_against) {
-    stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+    try {
+      stats.user = (await client.users.fetch(id)).toString()
+    } catch (e) {
+      stats.user = id;
+    }
     stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins} wins)`);
   }
   
   let most_lost_against = Object.entries(userStats.against).sort((a, b) => a[1].losses - b[1].losses).slice(0, 3);
   let most_lost = [];
   for (let [id, stats] of most_lost_against) {
-    stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+    try {
+      stats.user = (await client.users.fetch(id)).toString()
+    } catch (e) {
+      stats.user = id;
+    }
     stats.losses !== 0 && most_lost.push(`${stats.user} (${stats.losses} losses)`);
   }
   
   let highest_winstreak_against = Object.entries(userStats.against).sort((a, b) => b[1].winstreak - a[1].winstreak).slice(0, 3);
   let highest_winstreak = [];
   for (let [id, stats] of highest_winstreak_against) {
-    stats.user = (await interaction.guild.members.fetch(id)).toString() || id;
+    try {
+      stats.user = (await client.users.fetch(id)).toString()
+    } catch (e) {
+      stats.user = id;
+    }
     stats.winstreak !== 0 && highest_winstreak.push(`${stats.user} (${stats.winstreak} winstreak)`);
   }
   
