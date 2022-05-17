@@ -13,7 +13,7 @@ class TicTacToeManager {
     const embed = new MessageEmbed()
       .setColor(COLORS.INFO)
       .setTitle("TicTacToe")
-      .setDescription(`Do you want to play a game with ${target.toString()}? You have 15 seconds to answer.`)
+      .setDescription(`Do you want to play a game with ${interaction.user.toString()}? You have 15 seconds to answer.`)
     
     const components = new MessageActionRow()
       .addComponents([

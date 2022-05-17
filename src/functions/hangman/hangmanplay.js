@@ -72,8 +72,8 @@ module.exports = {
         return row;
       });
       newEmbed.fields[0].value = `Game over! **You lost!**\n\nThe word was: **${word}**`;
-      
-      let user = await User.findOne({userId: interaction.user.id});
+  
+      let user = await User.findById(interaction.user.id);
       if (!user) {
         user = new User({
           _id: interaction.user.id,
@@ -105,8 +105,8 @@ module.exports = {
         return row;
       });
       newEmbed.fields[0].value = "Game over! You won!\n\nThe word was: " + word;
-      
-      let user = await User.findOne({userId: interaction.user.id});
+  
+      let user = await User.findById(interaction.user.id);
       if (!user) {
         user = new User({
           _id: interaction.user.id,

@@ -5,7 +5,10 @@ require("dotenv").config();
 
 const logger = require("./utils/logger");
 
-const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS]});
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+  allowedMentions: { parse: ["users", "roles", "everyone"] }
+});
 client.games = new Collection();
 client.games.tictactoe = new Collection();
 
