@@ -17,6 +17,7 @@ const alphabets = [
 
 module.exports = {
   type: "COMMAND",
+  isGame: true,
   data: command,
   enabled: true,
   async execute (client, interaction, logger) {
