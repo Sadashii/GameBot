@@ -1,7 +1,5 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
-const {COLORS} = require("../../utils/data");
-const {ICONS} = require("./data");
+const GameManager = require("./tictactoemanager");
 
 const command = new SlashCommandBuilder()
   .setName("tictactoe")
@@ -33,34 +31,7 @@ module.exports = {
       });
     }
     
-    
-    await interaction.deferReply();
-    
-    const embed = new MessageEmbed()
-      .setTitle("TicTacToe")
-      .setDescription(`${interaction.user.toString()} vs ${opponent.toString()}\n\nMove: ${interaction.user.toString()}\nTurns: 0`)
-      .setColor(COLORS.INFO);
-    
-    const components = [];
-    for (let rowCount = 0; rowCount < 3; rowCount++) {
-      let row = new MessageActionRow();
-      for (let colCount = 0; colCount < 3; colCount++) {
-        row.addComponents(
-          new MessageButton()
-            .setCustomId(`tictactoe-${rowCount}-${colCount}`)
-            .setEmoji(ICONS.NONE)
-            .setStyle("SECONDARY"),
-        );
-      }
-      components.push(row);
-    }
-    
-    
-    await interaction.editReply({
-      content: `${interaction.user.toString()} vs ${opponent.toString()}`,
-      embeds: [embed],
-      components,
-    });
-    
+    await interaction.deferReply()
+    await GameManager.askForGame(interaction, opponent);
   },
 };
