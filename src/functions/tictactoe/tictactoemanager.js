@@ -2,18 +2,17 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const {MessageEmbed, MessageActionRow, MessageButton} = require("discord.js");
 const {COLORS} = require("../../utils/data");
-const {ICONS} = require("./data");
+const {ICONS} = require("../../utils/emojis");
 
 class TicTacToeManager {
   constructor () {
-    this.games = []
   }
   
   async askForGame (interaction, target) {
     const embed = new MessageEmbed()
       .setColor(COLORS.INFO)
       .setTitle("TicTacToe")
-      .setDescription(`Do you want to play a game with ${interaction.user.toString()}? You have 15 seconds to answer.`)
+      .setDescription(`Do you want to play a game of TicTacToe with ${interaction.user.toString()}? You have 15 seconds to answer.`)
     
     const components = new MessageActionRow()
       .addComponents([
@@ -74,7 +73,7 @@ class TicTacToeManager {
   async startGame(interaction, player1, player2) {
     const embed = new MessageEmbed()
       .setTitle("TicTacToe")
-      .setDescription(`${player1.toString()} vs ${player2.toString()}\n\nMove: ${player1.toString()}`)
+      .setDescription(`Move: ${player1.toString()}`)
       .setColor(COLORS.INFO);
 
     const components = [];
@@ -84,7 +83,7 @@ class TicTacToeManager {
         row.addComponents(
           new MessageButton()
             .setCustomId(`tictactoe-${rowCount}-${colCount}`)
-            .setEmoji(ICONS.NONE)
+            .setEmoji(ICONS.TRANSPARENT)
             .setStyle("SECONDARY"),
         );
       }
@@ -96,20 +95,33 @@ class TicTacToeManager {
       embeds: [embed],
       components,
     });
+  
+    await this.startUserDB(player1.user, player2)
+    await this.startUserDB(player2, player1.user)
+  }
+  
+  async parseGameDataFromPreviousMessage(interaction) {
+    let message = interaction.message;
+    let players = message.content.split(" vs ");
     
-    this.games.push({
-      gameID: interaction.id,
-      player1: player1.user,
-      player2: player2,
-      player1DB: await this.startGameDB(player1.user, player2),
-      player2DB: await this.startGameDB(player2, player1.user),
-      player1Turn: true,
-    })
+    let guildUsers = interaction.guild.members
+    let player1 = await guildUsers.fetch(players[0].slice(2, -1))
+    let player2 = await guildUsers.fetch(players[1].slice(2, -1))
+    let player1Turn = message.embeds[0].description.split(": ")[1] === player1.toString();
+    
+    return {
+      player1,
+      player2,
+      player1Turn,
+    }
   }
   
   async playerMove(interaction) {
-    let game = this.games.find(game => game.gameID === interaction.message.interaction.id)
-    if (!game) return;
+    const game = await this.parseGameDataFromPreviousMessage(interaction);
+    if (!game || !game.player1 || !game.player2) {
+      return;
+    }
+    
     
     if (game.player1Turn && game.player1.id !== interaction.user.id) {
       return await interaction.reply({
@@ -178,23 +190,17 @@ class TicTacToeManager {
         return row;
       });
       
-      
-      let winner = game.player1Turn ? game.player1DB : game.player2DB;
-      let loser = game.player1Turn ? game.player2DB : game.player1DB;
-      await this.scoreForWin(winner, loser);
-      
-      delete this.games[this.games.indexOf(game)];
+      await this.scoreForWin(game.player1Turn ? game.player1 : game.player2, game.player1Turn ? game.player2 : game.player1);
     }
     if (gameDraw) {
       embed.description = `Game is a draw!`;
       
-      await this.scoreForDraw(game.player1DB, game.player2DB);
-      delete this.games[this.games.indexOf(game)];
+      await this.scoreForDraw(game.player1, game.player2);
     }
     if (!gameOver && !gameDraw) {
       game.player1Turn = !game.player1Turn;
       let turn = game.player1Turn ? game.player1.toString() : game.player2.toString();
-      embed.description = `${game.player1.toString()} vs ${game.player2.toString()}\n\nMove: ${turn}`;
+      embed.description = `Move: ${turn}`;
     }
   
     await interaction.update({
@@ -203,7 +209,7 @@ class TicTacToeManager {
     });
   }
   
-  async startGameDB(player, against) {
+  async startUserDB(player, against) {
     let user = await User.findById(player.id);
     if (!user) {
       user = new User({_id: player.id});
@@ -245,14 +251,17 @@ class TicTacToeManager {
     return user;
   }
   
-  async scoreForWin(winner, loser) { // Here, both are monogoose objects insteads of discord user objects
+  async scoreForWin(winner, loser) {
+    winner = await User.findById(winner.id);
+    loser = await User.findById(loser.id);
+    
+    
     winner.tictactoe.wins++;
     winner.tictactoe.winstreak++;
     winner.tictactoe.against[loser._id].wins++;
     winner.tictactoe.against[loser._id].winstreak++;
     winner.markModified('tictactoe');
     await winner.save();
-    
     
     loser.tictactoe.losses++;
     loser.tictactoe.winstreak = 0;
@@ -262,7 +271,11 @@ class TicTacToeManager {
     await loser.save();
   }
   
-  async scoreForDraw (player1, player2) { // Here, both are monogoose objects insteads of discord user objects
+  async scoreForDraw (player1, player2) {
+    player1 = await User.findById(player1.id);
+    player2 = await User.findById(player2.id);
+  
+    
     player1.tictactoe.ties++;
     player1.tictactoe.winstreak = 0;
     player1.tictactoe.against[player2._id].ties++;
