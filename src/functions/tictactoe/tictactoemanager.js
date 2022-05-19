@@ -6,6 +6,43 @@ const {ICONS} = require("../../utils/emojis");
 
 class TicTacToeManager {
   constructor () {
+    this.pending_move_interactions = [];
+  }
+  
+  async waitForMove(interaction, user) {
+    this.pending_move_interactions.push(interaction.message.interaction.id);
+    
+    setTimeout(async () => {
+      if (this.pending_move_interactions.includes(interaction.message.interaction.id)) {
+        const game = await this.parseGameDataFromPreviousMessage(interaction)
+        
+        let components = interaction.message.components.map(row => {
+          row.components = row.components.map(component => {
+            component.disabled = true;
+            return component;
+          });
+          return row;
+        });
+        
+        let embed = interaction.message.embeds[0]
+        embed.setDescription(`Auto ending game due to inactivity... ${user.toString()} has not played their move in over 90 seconds. ${game.player1Turn ? game.player2.toString() : game.player1.toString()} has won the game!`)
+        
+        await interaction.editReply({
+          embeds: [embed],
+          components,
+        })
+  
+        await this.scoreForWin(!game.player1Turn ? game.player1 : game.player2, !game.player1Turn ? game.player2 : game.player1);
+        
+        this.pending_move_interactions.splice(this.pending_move_interactions.indexOf(interaction.message.interaction.id), 1);
+      }
+    }, 90 * 1000)
+  }
+  
+  async onMove(interaction) {
+    if (this.pending_move_interactions.includes(interaction.message.interaction.id)) {
+      this.pending_move_interactions.splice(this.pending_move_interactions.indexOf(interaction.message.interaction.id), 1);
+    }
   }
   
   async askForGame (interaction, target) {
@@ -73,7 +110,7 @@ class TicTacToeManager {
   async startGame(interaction, player1, player2) {
     const embed = new MessageEmbed()
       .setTitle("TicTacToe")
-      .setDescription(`Move: ${player1.toString()}`)
+      .setDescription(`Move: ${player1.toString()}\n\nYou must do your move within 90 seconds. (<t:${Math.round(new Date().getTime() / 1000) + 90}:R>)`)
       .setColor(COLORS.INFO);
 
     const components = [];
@@ -90,14 +127,16 @@ class TicTacToeManager {
       components.push(row);
     }
 
-    await interaction.editReply({
+    interaction.message = await interaction.editReply({
       content: `${player1.toString()} vs ${player2.toString()}`,
       embeds: [embed],
       components,
+      fetchReply: true,
     });
   
     await this.startUserDB(player1.user, player2)
     await this.startUserDB(player2, player1.user)
+    await this.waitForMove(interaction, player1)
   }
   
   async parseGameDataFromPreviousMessage(interaction) {
@@ -107,7 +146,7 @@ class TicTacToeManager {
     let guildUsers = interaction.guild.members
     let player1 = await guildUsers.fetch(players[0].slice(2, -1))
     let player2 = await guildUsers.fetch(players[1].slice(2, -1))
-    let player1Turn = message.embeds[0].description.split(": ")[1] === player1.toString();
+    let player1Turn = message.embeds[0].description.split('\n')[0].split(": ")[1] === player1.toString();
     
     return {
       player1,
@@ -134,6 +173,8 @@ class TicTacToeManager {
         ephemeral: true,
       });
     }
+    
+    await this.onMove(interaction)
   
     let components = interaction.message.components.map(row => {
       row.components = row.components.map(component => {
@@ -199,8 +240,9 @@ class TicTacToeManager {
     }
     if (!gameOver && !gameDraw) {
       game.player1Turn = !game.player1Turn;
-      let turn = game.player1Turn ? game.player1.toString() : game.player2.toString();
-      embed.description = `Move: ${turn}`;
+      let turn = game.player1Turn ? game.player1 : game.player2;
+      embed.description = `Move: ${turn.toString()}\n\nYou must do your move within 90 seconds. (<t:${Math.round(new Date().getTime() / 1000) + 90}:R>)`;
+      await this.waitForMove(interaction, turn);
     }
   
     await interaction.update({
