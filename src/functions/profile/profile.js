@@ -32,6 +32,8 @@ const tictactoe = async (client, interaction, user) => {
     });
   }
   
+  await interaction.deferReply()
+  
   
   let most_played_against = Object.entries(userStats.against).sort((a, b) => b[1].games - a[1].games).slice(0, 3);
   let most_played = [];
@@ -55,7 +57,7 @@ const tictactoe = async (client, interaction, user) => {
     stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins} wins)`);
   }
   
-  let most_lost_against = Object.entries(userStats.against).sort((a, b) => a[1].losses - b[1].losses).slice(0, 3);
+  let most_lost_against = Object.entries(userStats.against).sort((a, b) => b[1].losses - a[1].losses);
   let most_lost = [];
   for (let [id, stats] of most_lost_against) {
     try {
@@ -94,7 +96,7 @@ const tictactoe = async (client, interaction, user) => {
     .addField("Highest win streak against (currently)", highest_winstreak.join("\n") || "-", true)
     .setColor(COLORS.SUCCESS);
   
-  await interaction.reply({
+  await interaction.editReply({
     embeds: [embed],
   });
 };
