@@ -43,7 +43,7 @@ const tictactoe = async (client, interaction, user) => {
     } catch (e) {
       stats.user = id;
     }
-    stats.games !== 0 && most_played.push(`${stats.user} (${stats.games} games)`);
+    stats.games !== 0 && most_played.push(`${stats.user} (${stats.games})`);
   }
   
   let most_won_against = Object.entries(userStats.against).sort((a, b) => b[1].wins - a[1].wins).slice(0, 3);
@@ -54,10 +54,10 @@ const tictactoe = async (client, interaction, user) => {
     } catch (e) {
       stats.user = id;
     }
-    stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins} wins)`);
+    stats.wins !== 0 && most_won.push(`${stats.user} (${stats.wins})`);
   }
   
-  let most_lost_against = Object.entries(userStats.against).sort((a, b) => b[1].losses - a[1].losses);
+  let most_lost_against = Object.entries(userStats.against).sort((a, b) => b[1].losses - a[1].losses).slice(0, 3);
   let most_lost = [];
   for (let [id, stats] of most_lost_against) {
     try {
@@ -65,7 +65,7 @@ const tictactoe = async (client, interaction, user) => {
     } catch (e) {
       stats.user = id;
     }
-    stats.losses !== 0 && most_lost.push(`${stats.user} (${stats.losses} losses)`);
+    stats.losses !== 0 && most_lost.push(`${stats.user} (${stats.losses})`);
   }
   
   let highest_winstreak_against = Object.entries(userStats.against).sort((a, b) => b[1].winstreak - a[1].winstreak).slice(0, 3);
@@ -76,7 +76,7 @@ const tictactoe = async (client, interaction, user) => {
     } catch (e) {
       stats.user = id;
     }
-    stats.winstreak !== 0 && highest_winstreak.push(`${stats.user} (${stats.winstreak} winstreak)`);
+    stats.winstreak !== 0 && highest_winstreak.push(`${stats.user} (${stats.winstreak})`);
   }
   
   
