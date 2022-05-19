@@ -83,7 +83,7 @@ class TicTacToeManager {
           .setDescription(`Can't play a game with ${target.toString()}, they've declined your request.`)
   
         await interaction.editReply({
-          content: interaction.user.toString(),
+          content: interaction.member.toString(),
           embeds: [embed],
           components: [],
         })
@@ -142,10 +142,11 @@ class TicTacToeManager {
   async parseGameDataFromPreviousMessage(interaction) {
     let message = interaction.message;
     let players = message.content.split(" vs ");
+    players = players.map(id => id.replace(/[^0-9]/g, ""))
     
     let guildUsers = interaction.guild.members
-    let player1 = await guildUsers.fetch(players[0].slice(2, -1))
-    let player2 = await guildUsers.fetch(players[1].slice(2, -1))
+    let player1 = await guildUsers.fetch(players[0])
+    let player2 = await guildUsers.fetch(players[1])
     let player1Turn = message.embeds[0].description.split('\n')[0].split(": ")[1] === player1.toString();
     
     return {

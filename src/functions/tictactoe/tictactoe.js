@@ -16,7 +16,7 @@ module.exports = {
   data: command,
   enabled: true,
   async execute (client, interaction, logger) {
-    const opponent = interaction.options.getUser("opponent");
+    const opponent = interaction.options.getMember("opponent");
     
     if (opponent.id === interaction.user.id) {
       return await interaction.reply({
