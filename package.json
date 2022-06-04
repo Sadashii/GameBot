@@ -4,7 +4,8 @@
   "description": "A discord bot for the games",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "node src/index.js",
+    "dev": "nodemon"
   },
   "repository": {
     "type": "git",
