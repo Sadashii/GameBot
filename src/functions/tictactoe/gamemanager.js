@@ -3,10 +3,18 @@ const User = mongoose.model("User");
 const {MessageEmbed, MessageActionRow, MessageButton} = require("discord.js");
 const {COLORS} = require("../../utils/data");
 const {ICONS} = require("../../utils/emojis");
+const _ = require("../../utils/utils");
 
-class TicTacToeManager {
+class GameManager {
   constructor () {
+    this.game = 'TicTacToe'
     this.pending_move_interactions = [];
+  }
+  get clientObject() {
+    return this.client
+  }
+  set clientObject(client) {
+    this.client = client
   }
   
   async waitForMove(interaction, user) {
@@ -23,10 +31,12 @@ class TicTacToeManager {
           });
           return row;
         });
-        
-        let embed = interaction.message.embeds[0]
-        embed.setDescription(`Auto ending game due to inactivity... ${user.toString()} has not played their move in over 90 seconds. ${game.player1Turn ? game.player2.toString() : game.player1.toString()} has won the game!`)
-        
+
+        const embed = new MessageEmbed()
+          .setTitle(this.game)
+          .setColor(COLORS.ERROR)
+          .setDescription(`Terminating game due to inactivity... ${user.toString()} has not played their move in over 90 seconds. ${game.turn.toString()} has won the game!`)
+  
         await interaction.editReply({
           embeds: [embed],
           components,
@@ -44,46 +54,50 @@ class TicTacToeManager {
       this.pending_move_interactions.splice(this.pending_move_interactions.indexOf(interaction.message.interaction.id), 1);
     }
   }
-  
-  async askForGame (interaction, target) {
+
+  async askForGame (interaction, player1, player2) {
     const embed = new MessageEmbed()
       .setColor(COLORS.INFO)
-      .setTitle("TicTacToe")
-      .setDescription(`Do you want to play a game of TicTacToe with ${interaction.user.toString()}? You have 15 seconds to answer.`)
-    
-    const components = new MessageActionRow()
-      .addComponents([
-        new MessageButton()
-          .setCustomId(`tictactoeaskforgame-yes`)
-          .setLabel("Yes")
-          .setStyle("SUCCESS"),
-        new MessageButton()
-          .setCustomId(`tictactoeaskforgame-decline`)
-          .setLabel("No")
-          .setStyle("DANGER"),
-        ]
-      )
-    
-    const prompt = await interaction.editReply({
-      content: target.toString(),
+      .setTitle(this.game)
+      .setDescription(this.client.messages.GAME_PROMPT_ASK(player1, this.game))
+
+    const components = [
+      new MessageActionRow()
+        .addComponents([
+            new MessageButton()
+              .setCustomId(`${this.game}askforgame-accept`)
+              .setLabel("Accept")
+              .setStyle("SUCCESS"),
+            new MessageButton()
+              .setCustomId(`${this.game}askforgame-decline`)
+              .setLabel("Decline")
+              .setStyle("DANGER"),
+          ]
+        )
+    ]
+
+    const prompt = await interaction.reply({
+      content: player2.toString(),
       embeds: [embed],
-      components: [components],
+      components: components,
       fetchReply: true,
     })
-  
-    const filter = (interaction) => interaction.user.id === target.id;
+
+    const filter = (interaction) => interaction.user.id === player2.user.id;
     const collector = prompt.createMessageComponentCollector({ filter, time: 15_000 });
     collector.on('collect', async button => {
-      if (button.customId === "tictactoeaskforgame-yes") {
-        await this.startGame(interaction, interaction.member, target)
-      } else if (button.customId === "tictactoeaskforgame-decline") {
+      if (button.customId === `${this.game}askforgame-accept`) {
+        return await this.startGame(interaction, player1, player2)
+      }
+      
+      if (button.customId === `${this.game}askforgame-decline`) {
         const embed = new MessageEmbed()
           .setColor(COLORS.ERROR)
-          .setTitle("TicTacToe")
-          .setDescription(`Can't play a game with ${target.toString()}, they've declined your request.`)
-  
-        await interaction.editReply({
-          content: interaction.member.toString(),
+          .setTitle(this.game)
+          .setDescription(this.client.messages.GAME_PROMPT_DENIED(player2))
+
+        return await interaction.editReply({
+          content: player1.toString(),
           embeds: [embed],
           components: [],
         })
@@ -93,24 +107,22 @@ class TicTacToeManager {
       if (collected.size === 0) {
         const embed = new MessageEmbed()
           .setColor(COLORS.ERROR)
-          .setTitle("TicTacToe")
-          .setDescription(`Can't play a game with ${target.toString()}, they didn't respond to your request.`)
-  
+          .setTitle(this.game)
+          .setDescription(this.client.messages.GAME_PROMPT_NO_REPLY(player2))
         
-        await interaction.editReply({
-          content: interaction.user.toString(),
+        return await interaction.editReply({
+          content: player1.toString(),
           embeds: [embed],
           components: [],
         })
       }
-      // No need to handle the case where a response is collected because it is handled when a button is pressed.
     });
   }
   
   async startGame(interaction, player1, player2) {
     const embed = new MessageEmbed()
-      .setTitle("TicTacToe")
-      .setDescription(`Move: ${player1.toString()}\n\nYou must do your move within 90 seconds. (<t:${Math.round(new Date().getTime() / 1000) + 90}:R>)`)
+      .setTitle(this.game)
+      .setDescription(`Move: ${player1.toString()}\n\nYou have until ${_.timeStampFromNow(90)} to make your move!`)
       .setColor(COLORS.INFO);
 
     const components = [];
@@ -153,22 +165,21 @@ class TicTacToeManager {
       player1,
       player2,
       player1Turn,
+      turn: player1Turn ? player1 : player2
     }
   }
   
   async playerMove(interaction) {
     const game = await this.parseGameDataFromPreviousMessage(interaction);
     if (!game || !game.player1 || !game.player2) {
+      await interaction.reply({
+        content: "Could not load complete game data - Cannot play",
+        ephemeral: true
+      })
       return;
     }
     
-    
-    if (game.player1Turn && game.player1.id !== interaction.user.id) {
-      return await interaction.reply({
-        content: `${ICONS.CROSS} | It's not your turn!`,
-        ephemeral: true,
-      });
-    } else if (!game.player1Turn && game.player2.id !== interaction.user.id) {
+    if (game.turn.user.id !== interaction.user.id) {
       return await interaction.reply({
         content: `${ICONS.CROSS} | It's not your turn!`,
         ephemeral: true,
@@ -335,5 +346,5 @@ class TicTacToeManager {
   }
 }
 
-const TicTacToeGameManager = new TicTacToeManager();
-module.exports = TicTacToeGameManager;
+const GameManagerInstance = new GameManager();
+module.exports = GameManagerInstance;

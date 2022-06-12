@@ -3,6 +3,7 @@ const fs = require("fs");
 const mongoose = require("mongoose");
 const cleanup = require("./utils/cleanup");
 require("dotenv").config();
+const messages = require("./utils/messages");
 
 const logger = require("./utils/logger");
 
@@ -53,6 +54,7 @@ client.once("ready", async () => {
     type: "PLAYING",
   });
 
+  client.messages = messages
   logger.info(`Logged in as ${client.user.tag}`);
 });
 

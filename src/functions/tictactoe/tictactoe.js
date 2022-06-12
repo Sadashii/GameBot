@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const GameManager = require("./tictactoemanager");
+const GameManager = require("./gamemanager");
 
 const command = new SlashCommandBuilder()
   .setName("tictactoe")
@@ -17,7 +17,7 @@ module.exports = {
   enabled: true,
   async execute (client, interaction, logger) {
     const opponent = interaction.options.getMember("opponent");
-    
+  
     if (opponent.id === interaction.user.id) {
       return await interaction.reply({
         content: "<:cross:973110683048755260> | You can't play against yourself!",
@@ -31,7 +31,7 @@ module.exports = {
       });
     }
     
-    await interaction.deferReply()
-    await GameManager.askForGame(interaction, opponent);
+    if (!GameManager.clientObject) GameManager.clientObject = client
+    await GameManager.askForGame(interaction, interaction.member, opponent);
   },
 };

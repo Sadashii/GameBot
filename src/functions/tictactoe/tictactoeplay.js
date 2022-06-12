@@ -1,4 +1,4 @@
-const GameManager = require("./tictactoemanager");
+const GameManager = require("./gamemanager");
 
 module.exports = {
   name: "tictactoe",
