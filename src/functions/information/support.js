@@ -24,7 +24,7 @@ module.exports = {
         .addComponents([
           new MessageButton()
             .setURL(config.INVITE_URL)
-            .setLabel("Invite me to your server")
+            .setLabel("Add to your server")
             .setStyle("LINK"),
           new MessageButton()
             .setURL(`https://top.gg/bot/${client.user.id}/vote`)

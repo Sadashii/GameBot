@@ -1,6 +1,7 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
 const {COLORS} = require("../../utils/data");
+const {config} = require("../../config");
 
 const command = new SlashCommandBuilder()
   .setName("vote")
@@ -14,13 +15,17 @@ module.exports = {
   async execute (client, interaction, logger) {
     const embed = new MessageEmbed()
       .setColor(COLORS.SUCCESS)
-      .setDescription("You can vote for me on top.gg from the link below - Thanks 🙂\n\nPS: Help out more with a 5-star positive review!")
+      .setDescription("Support by voting for me (and leaving a 5-star review) on top.gg - Thanks 🙂")
 
     const components = new MessageActionRow()
       .addComponents([
         new MessageButton()
           .setURL(`https://top.gg/bot/${client.user.id}/vote`)
           .setLabel("Vote on top.gg")
+          .setStyle("LINK"),
+        new MessageButton()
+          .setURL(config.INVITE_URL)
+          .setLabel("Add to your server")
           .setStyle("LINK"),
       ])
 
