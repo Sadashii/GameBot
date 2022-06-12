@@ -65,7 +65,7 @@ client.on("interactionCreate", async interaction => {
         client.buttons.get(button.name).uses = 0;
       }
       client.buttons.get(button.name).uses++;
-      return await button(client, interaction, logger);
+      return await button.execute(client, interaction, logger);
     }
   }
 
