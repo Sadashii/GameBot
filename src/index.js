@@ -1,10 +1,11 @@
 const {Client, Intents, Collection} = require("discord.js");
 const fs = require("fs");
 const mongoose = require("mongoose");
+const { AutoPoster } = require('topgg-autoposter')
+
 const cleanup = require("./utils/cleanup");
 require("dotenv").config();
 const messages = require("./utils/messages");
-
 const logger = require("./utils/logger");
 
 const client = new Client({
@@ -13,6 +14,14 @@ const client = new Client({
 });
 client.games = new Collection();
 client.games.tictactoe = new Collection();
+
+// Top.gg stats poster
+if (process.env.NODE_ENV === "PRODUCTION") {
+  const ap = AutoPoster(process.env.TOPGG_TOKEN, client)
+  ap.on('posted', () => {
+    logger.info("Posted stats to Top.gg")
+  })
+}
 
 // Load db models
 fs.readdirSync("./src/models").filter(file => file.endsWith(".js")).forEach(file => {
