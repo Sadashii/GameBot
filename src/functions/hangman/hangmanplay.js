@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const {animations} = require("./data");
 const {MessageEmbed} = require("discord.js");
-const {decodeFromID} = require("../../utils/encryption");
+const _ = require("../../utils/utils");
 const User = mongoose.model("User");
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
     const dataField = embed.fields[0].value.split("\n");
     let livesLeft = dataField[1].split(": ")[1];
     let charactersGuessed = dataField[2].split(": ")[1];
-    const word = decodeFromID(embed.footer.text.split(": ")[1]);
+    const word = _.decryptString(embed.footer.text.split(" | ")[0].split(": ")[1]);
 
     const characterGuessed = interaction.customId.split("-")[1].toLowerCase();
     const isCharacterValid = word.includes(characterGuessed);
@@ -49,7 +49,7 @@ module.exports = {
       .setColor(embed.color)
       .addField("Game Information", `Word length: ${word.length}\nLives left: ${livesLeft}\nCharacters guessed: ${charactersGuessed}\n\nWord: ${wordHash}`, true)
       .addField("Avatar", `\`\`\`${animation}\`\`\``, true)
-      .setFooter(embed.footer.text);
+      .setFooter(`Game ID: ${_.encryptString(word)} | ${client.messages.RANDOM_BOT_TIP()}`);
 
     let components = game.components.map(row => {
       row.components = row.components.map(component => {

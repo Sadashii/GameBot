@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const {MessageEmbed, MessageActionRow, MessageButton} = require("discord.js");
-const {COLORS} = require("../../utils/data");
-const {ICONS} = require("../../utils/emojis");
+const {COLORS, EMOJIS} = require("../../utils/data");
 const _ = require("../../utils/utils");
 
 class GameManager {
@@ -123,6 +122,7 @@ class GameManager {
     const embed = new MessageEmbed()
       .setTitle(this.game)
       .setDescription(`Move: ${player1.toString()}\n\nYou have until ${_.timeStampFromNow(90)} to make your move!`)
+      .setFooter(this.client.messages.RANDOM_BOT_TIP())
       .setColor(COLORS.INFO);
 
     const components = [];
@@ -132,7 +132,7 @@ class GameManager {
         row.addComponents(
           new MessageButton()
             .setCustomId(`tictactoe-${rowCount}-${colCount}`)
-            .setEmoji(ICONS.TRANSPARENT)
+            .setEmoji(EMOJIS.TRANSPARENT)
             .setStyle("SECONDARY"),
         );
       }
@@ -181,7 +181,7 @@ class GameManager {
     
     if (game.turn.user.id !== interaction.user.id) {
       return await interaction.reply({
-        content: `${ICONS.CROSS} | It's not your turn!`,
+        content: `${EMOJIS.CROSS} | It's not your turn!`,
         ephemeral: true,
       });
     }
@@ -191,7 +191,7 @@ class GameManager {
     let components = interaction.message.components.map(row => {
       row.components = row.components.map(component => {
         if (component.customId === interaction.customId) {
-          let emoji = game.player1Turn ? ICONS.CROSS : ICONS.ZERO;
+          let emoji = game.player1Turn ? EMOJIS.CROSS : EMOJIS.ZERO;
           let background = game.player1Turn ? "SUCCESS" : "DANGER";
 
           component.setEmoji(emoji);
@@ -256,6 +256,8 @@ class GameManager {
       embed.description = `Move: ${turn.toString()}\n\nYou must do your move within 90 seconds. (<t:${Math.round(new Date().getTime() / 1000) + 90}:R>)`;
       await this.waitForMove(interaction, turn);
     }
+
+    embed.setFooter(this.client.messages.RANDOM_BOT_TIP())
   
     await interaction.update({
       embeds: [embed],

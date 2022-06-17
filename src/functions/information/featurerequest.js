@@ -1,8 +1,8 @@
-const {SlashCommandBuilder, ButtonBuilder} = require("@discordjs/builders");
+const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
 const {COLORS} = require("../../utils/data");
 const {config} = require("../../config")
-const {encodeToID} = require("../../utils/encryption");
+const _ = require("../../utils/utils");
 
 const command = new SlashCommandBuilder()
   .setName("featurerequest")
@@ -28,7 +28,7 @@ module.exports = {
       .setColor(COLORS.INFO)
       .setTitle("Feature Request")
       .setDescription(interaction.options.getString("feature"))
-      .setFooter(`Requested by ${encodeToID(interaction.user.id)}`)
+      .setFooter(`Requested by ${_.encryptString(interaction.user.id)}`)
 
     const message = await feature_requests_channel.send({
       embeds: [embed]

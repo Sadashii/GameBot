@@ -2,7 +2,7 @@ const {SlashCommandBuilder} = require("@discordjs/builders");
 const {MessageActionRow, MessageButton, MessageEmbed} = require("discord.js");
 const {COLORS} = require("../../utils/data");
 const {words, animations} = require("./data");
-const {encodeToID} = require("../../utils/encryption");
+const _ = require("../../utils/utils");
 
 const command = new SlashCommandBuilder()
   .setName("hangman")
@@ -33,7 +33,7 @@ module.exports = {
       .setColor(COLORS.INFO)
       .addField("Game Information", `Word length: ${word.length}\nLives left: 8\nCharacters guessed: \n\nWord: ${wordHash}`, true)
       .addField("Avatar", `\`\`\`${animations[0].join("\n")}\`\`\``, true)
-      .setFooter(`Game ID: ${encodeToID(word)}`);
+      .setFooter(`Game ID: ${_.encryptString(word)} | ${client.messages.RANDOM_BOT_TIP()}`);
 
     const components = [];
     for (const alphabetRow of alphabets) {
