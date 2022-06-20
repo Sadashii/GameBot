@@ -13,7 +13,6 @@ const client = new Client({
   allowedMentions: { parse: ["users", "roles", "everyone"] }
 });
 client.games = new Collection();
-client.games.tictactoe = new Collection();
 
 // Top.gg stats poster
 if (process.env.NODE_ENV === "PRODUCTION") {

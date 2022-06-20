@@ -23,29 +23,54 @@ class GameManager {
       if (this.pending_move_interactions.includes(interaction.message.interaction.id)) {
         const game = await this.parseGameDataFromPreviousMessage(interaction)
         
-        let components = interaction.message.components.map(row => {
-          row.components = row.components.map(component => {
-            component.disabled = true;
-            return component;
-          });
-          return row;
-        });
-
+        // First send a warning embed
         const embed = new MessageEmbed()
           .setTitle(this.game)
-          .setColor(COLORS.ERROR)
-          .setDescription(`Terminating game due to inactivity... ${user.toString()} has not played their move in over 90 seconds. ${game.turn.toString()} has won the game!`)
+          .setColor(COLORS.INFO)
+          .setDescription(`You are running out of time! Make your move ${_.timeStampFromNow(30)} or else game will be terminated!`)
   
-        await interaction.editReply({
+        let components = [new MessageActionRow()
+                            .addComponents(
+                              new MessageButton()
+                                .setStyle("LINK")
+                                .setLabel("Game Message")
+                                .setURL(interaction.message.url)
+                            )]
+        
+        const runningOutOfTime = await interaction.channel.send({
+          content: `⌛ ${user.toString()} make your move! You're running out of time!`,
           embeds: [embed],
           components,
         })
   
-        await this.scoreForWin(!game.player1Turn ? game.player1 : game.player2, !game.player1Turn ? game.player2 : game.player1);
+  
+        // Wait 30 more seconds for the termination
+        setTimeout(async () => {
+          const embed = new MessageEmbed()
+            .setTitle(this.game)
+            .setColor(COLORS.ERROR)
+            .setDescription(`Terminating game due to inactivity... ${user.toString()} has not played their move in over 90 seconds. ${game.turn.toString()} has won the game!`)
+  
+          let components = interaction.message.components.map(row => {
+            row.components = row.components.map(component => {
+              component.disabled = true;
+              return component;
+            });
+            return row;
+          });
+  
+          await interaction.editReply({
+            embeds: [embed],
+            components,
+          })
+          await this.scoreForWin(!game.player1Turn ? game.player1 : game.player2, !game.player1Turn ? game.player2 : game.player1);
+  
+          this.pending_move_interactions.splice(this.pending_move_interactions.indexOf(interaction.message.interaction.id), 1);
+          await runningOutOfTime.delete()
+        }, 30 * 1000)
         
-        this.pending_move_interactions.splice(this.pending_move_interactions.indexOf(interaction.message.interaction.id), 1);
       }
-    }, 90 * 1000)
+    }, 60 * 1000)
   }
   
   async onMove(interaction) {
